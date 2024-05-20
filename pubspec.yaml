@@ -42,6 +42,8 @@ dependencies:
   cloud_firestore: ^4.3.0
   fluttertoast: ^8.2.5
   flutter_phone_direct_caller : ^2.1.1
+  image_picker: ^0.8.4+4
+  firebase_storage: ^11.7.5
 
 dev_dependencies:
   flutter_test:

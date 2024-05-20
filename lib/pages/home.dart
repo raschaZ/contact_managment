@@ -21,15 +21,33 @@ class _HomeState extends State<Home> {
     await FirebaseFirestore.instance.collection("contacts").doc(id).delete();
     if (mounted) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text("contact deleted")));
+          .showSnackBar(const SnackBar(content: Text("Contact deleted")));
     }
   }
+
+  void callContact(String phoneNumber) async {
+    bool? res = await FlutterPhoneDirectCaller.callNumber(phoneNumber);
+    if (res == false) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text("Failed to make call")));
+      }
+    }
+  }
+
+  final List<Color> _backgroundColors = [
+    Colors.blue[50]!,
+    Colors.green[50]!,
+    Colors.orange[50]!,
+    Colors.pink[50]!,
+    Colors.purple[50]!,
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Flutter Contacts"),
+        title: const Text("Manage Contacts"),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
@@ -49,51 +67,70 @@ class _HomeState extends State<Home> {
           if (snapshot.hasData) {
             final List<QueryDocumentSnapshot> docs = snapshot.data!.docs;
             if (docs.isEmpty) {
-              return Center(child: Text("No Data"));
+              return const Center(child: Text("No Data"));
             }
             return ListView.builder(
-                itemCount: docs.length,
-                itemBuilder: (context, index) {
-                  final contact = docs[index].data() as Map<String, dynamic>;
-                  final contactID = docs[index].id;
-                  final String contactName = contact["name"];
-                  final String contactPhone = contact["phone"];
-                  final String contactPhoto = contact["photo"];
-                  return ListTile(
-                    title: Text(contactName),
-                    subtitle: Text("$contactPhone"),
-                    leading: Hero(
-                      tag:  contactID,
-                      child: CircleAvatar(
-                        backgroundImage: AssetImage(contactPhoto),
-                      ),
+              itemCount: docs.length,
+              itemBuilder: (context, index) {
+                final contact = docs[index].data() as Map<String, dynamic>;
+                final contactID = docs[index].id;
+                final String contactName = contact["name"];
+                final String contactPhone = contact["phone"];
+                final String contactPhoto = contact["photo"];
+                final Color bgColor = _backgroundColors[index % _backgroundColors.length]; // Choose background color based on index
+
+                return Container(
+                  margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                  decoration: BoxDecoration(
+                    color: bgColor,
+                    borderRadius: BorderRadius.circular(10),
+                  ),                  child: ListTile(
+                    title: Text(contactName ,style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),),
+                    subtitle: Text(contactPhone),
+                  leading: Hero(
+                    tag: contactID,
+                    child: CircleAvatar(
+                      backgroundImage: NetworkImage(contactPhoto),
                     ),
+                  ),
+
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         IconButton(
-                            onPressed: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => EditContact(
-                                          name: contactName,
-                                          phone: contactPhone,
-                                          photo: contactPhoto,
-                                          id: contactID,
-                                      )));
-                            },
-                            icon: Icon(IconlyBroken.edit)),
+                          onPressed: () => callContact(contactPhone),
+                          icon: const Icon(IconlyBroken.call,color: Colors.lightGreen,),
+                        ),
                         IconButton(
-                            onPressed: () => deleteContact(contactID),
-                            icon: Icon(IconlyBroken.delete))
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => EditContact(
+                                  name: contactName,
+                                  phone: contactPhone,
+                                  photo: contactPhoto,
+                                  id: contactID,
+                                ),
+                              ),
+                            );
+                          },
+                          icon: const Icon(IconlyBroken.edit ,color: Colors.orange,),
+                        ),
+                        IconButton(
+                          onPressed: () => deleteContact(contactID),
+                          icon: const Icon(IconlyBroken.delete,color: Colors.red,),
+                        )
                       ],
                     ),
-                  );
-                });
+
+                  ),
+                );
+              },
+            );
           } else if (snapshot.hasError) {
-            return Center(
-              child: Text("error"),
+            return const Center(
+              child: Text("Error"),
             );
           }
           return const Center(
