@@ -1,4 +1,7 @@
-import 'package:contact_managment/firebase_options.dart';
+import 'package:contact_managment/pages/login_page.dart';
+import 'package:contact_managment/pages/sign_up_page.dart';
+import 'package:contact_managment/pages/splash_screen.dart';
+import 'package:contact_managment/utils/firebase_options.dart';
 import 'package:contact_managment/pages/home.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +27,15 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const Home()
+      routes: {
+        '/': (context) => const SplashScreen(
+          // Here, you can decide whether to show the LoginPage or HomePage based on user authentication
+          child: LoginPage(),
+        ),
+        '/login': (context) => const LoginPage(),
+        '/signUp': (context) => const SignUpPage(),
+        '/home': (context) => const Home(),
+      },
     );
   }
 }

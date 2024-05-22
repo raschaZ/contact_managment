@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
+import 'package:contact_managment/pages/form_container_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:contact_managment/utils/toast.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:iconly/iconly.dart';
 import 'dart:io';
@@ -91,6 +93,7 @@ class _EditContactState extends State<EditContact> {
           "photo": photoController.text.trim(),
         });
         Navigator.pop(context);
+        showToast(message:"Contact updated successfully");
       } on FirebaseException catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Failed to update contact: ${e.message}")),
@@ -126,35 +129,28 @@ class _EditContactState extends State<EditContact> {
                     ),
                   ),
                 ),
-                TextFormField(
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                const SizedBox(height: 20),
+                FormContainerWidget(
                   controller: nameController,
-                  textInputAction: TextInputAction.next,
+                  hintText: "Name",
                   validator: (value) {
                     if (value!.isEmpty) {
                       return "Please enter a name";
                     }
                     return null;
                   },
-                  decoration: const InputDecoration(
-                    hintText: "Name",
-                  ),
                 ),
                 const SizedBox(height: 20),
-                TextFormField(
-                  keyboardType: TextInputType.phone,
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                FormContainerWidget(
                   controller: phoneController,
-                  textInputAction: TextInputAction.next,
+                  hintText: "Phone",
+                  inputType: TextInputType.phone,
                   validator: (value) {
                     if (value!.isEmpty) {
                       return "Please enter a phone number";
                     }
                     return null;
                   },
-                  decoration: const InputDecoration(
-                    hintText: "Phone",
-                  ),
                 ),
                 const SizedBox(height: 20),
                 const SizedBox(height: 40),

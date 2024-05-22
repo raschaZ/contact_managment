@@ -1,10 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:contact_managment/pages/add_contact.dart';
 import 'package:contact_managment/pages/edit_contact.dart';
+import 'package:contact_managment/utils/toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:iconly/iconly.dart';
-import '../Contact.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -14,14 +15,12 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  final contactCollection =
-      FirebaseFirestore.instance.collection("contacts").snapshots();
+  final contactCollection = FirebaseFirestore.instance.collection("contacts").snapshots();
 
   void deleteContact(String id) async {
     await FirebaseFirestore.instance.collection("contacts").doc(id).delete();
     if (mounted) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text("Contact deleted")));
+      showToast(message:"Contact deleted successfully");
     }
   }
 
@@ -29,8 +28,7 @@ class _HomeState extends State<Home> {
     bool? res = await FlutterPhoneDirectCaller.callNumber(phoneNumber);
     if (res == false) {
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text("Failed to make call")));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Failed to make call")));
       }
     }
   }
@@ -48,6 +46,16 @@ class _HomeState extends State<Home> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Manage Contacts"),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () async {
+              await FirebaseAuth.instance.signOut();
+              Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+              showToast(message:"Successfully signed out");
+            },
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
@@ -84,22 +92,28 @@ class _HomeState extends State<Home> {
                   decoration: BoxDecoration(
                     color: bgColor,
                     borderRadius: BorderRadius.circular(10),
-                  ),                  child: ListTile(
-                    title: Text(contactName ,style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),),
-                    subtitle: Text(contactPhone),
-                  leading: Hero(
-                    tag: contactID,
-                    child: CircleAvatar(
-                      backgroundImage: NetworkImage(contactPhoto),
-                    ),
                   ),
-
+                  child: ListTile(
+                    title: Text(
+                      contactName,
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                    ),
+                    subtitle: Text(contactPhone),
+                    leading: Hero(
+                      tag: contactID,
+                      child: CircleAvatar(
+                        backgroundImage: NetworkImage(contactPhoto),
+                      ),
+                    ),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         IconButton(
                           onPressed: () => callContact(contactPhone),
-                          icon: const Icon(IconlyBroken.call,color: Colors.lightGreen,),
+                          icon: const Icon(
+                            IconlyBroken.call,
+                            color: Colors.lightGreen,
+                          ),
                         ),
                         IconButton(
                           onPressed: () {
@@ -115,15 +129,20 @@ class _HomeState extends State<Home> {
                               ),
                             );
                           },
-                          icon: const Icon(IconlyBroken.edit ,color: Colors.orange,),
+                          icon: const Icon(
+                            IconlyBroken.edit,
+                            color: Colors.orange,
+                          ),
                         ),
                         IconButton(
                           onPressed: () => deleteContact(contactID),
-                          icon: const Icon(IconlyBroken.delete,color: Colors.red,),
+                          icon: const Icon(
+                            IconlyBroken.delete,
+                            color: Colors.red,
+                          ),
                         )
                       ],
                     ),
-
                   ),
                 );
               },
@@ -134,7 +153,7 @@ class _HomeState extends State<Home> {
             );
           }
           return const Center(
-            child: Text("500"),
+            child: CircularProgressIndicator(),
           );
         },
       ),

@@ -1,12 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
+import 'package:contact_managment/pages/form_container_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:contact_managment/utils/toast.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:iconly/iconly.dart';
 import 'dart:io';
 
 class AddContact extends StatefulWidget {
-  const AddContact({super.key});
+  const AddContact({Key? key}) : super(key: key);
 
   @override
   State<AddContact> createState() => _AddContactState();
@@ -14,9 +16,9 @@ class AddContact extends StatefulWidget {
 
 class _AddContactState extends State<AddContact> {
   final _formKey = GlobalKey<FormState>();
-  final nameController = TextEditingController();
-  final phoneController = TextEditingController();
-  final photoController = TextEditingController();
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
+  final TextEditingController photoController = TextEditingController();
   final ImagePicker _picker = ImagePicker();
   String currentPhoto = '';
   File? _imageFile;
@@ -51,9 +53,7 @@ class _AddContactState extends State<AddContact> {
           currentPhoto = downloadUrl;
         });
       } catch (err) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Failed to upload image: $err")),
-        );
+        showToast(message: "Failed to upload image: $err");
       }
     }
   }
@@ -68,16 +68,13 @@ class _AddContactState extends State<AddContact> {
         });
         if (mounted) {
           Navigator.pop(context);
+          showToast(message: "Contact added successfully");
         }
       } on FirebaseException {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Something went wrong")),
-        );
+        showToast(message: "Something went wrong");
       }
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please fill all the fields")),
-      );
+      showToast(message: "Please fill all the fields");
     }
   }
 
@@ -107,35 +104,27 @@ class _AddContactState extends State<AddContact> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                TextFormField(
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                FormContainerWidget(
                   controller: nameController,
-                  textInputAction: TextInputAction.next,
+                  hintText: "Name",
                   validator: (value) {
                     if (value!.isEmpty) {
                       return "Please enter a name";
                     }
                     return null;
                   },
-                  decoration: const InputDecoration(
-                    hintText: "Name",
-                  ),
                 ),
                 const SizedBox(height: 20),
-                TextFormField(
-                  keyboardType: TextInputType.phone,
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                FormContainerWidget(
                   controller: phoneController,
-                  textInputAction: TextInputAction.next,
+                  hintText: "Phone",
+                  inputType: TextInputType.phone,
                   validator: (value) {
                     if (value!.isEmpty) {
                       return "Please enter a phone number";
                     }
                     return null;
                   },
-                  decoration: const InputDecoration(
-                    hintText: "Phone",
-                  ),
                 ),
                 const SizedBox(height: 40),
                 SizedBox(
