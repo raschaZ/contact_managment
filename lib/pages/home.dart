@@ -8,7 +8,7 @@ import 'package:iconly/iconly.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class Home extends StatefulWidget {
-  const Home({super.key});
+  const Home({Key? key});
 
   @override
   _HomeState createState() => _HomeState();
@@ -16,11 +16,26 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   final contactCollection = FirebaseFirestore.instance.collection("contacts").snapshots();
+  late TextEditingController _searchController;
+  late List<QueryDocumentSnapshot> _contacts;
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController = TextEditingController(); // Initialize _searchController here
+    _contacts = [];
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   void deleteContact(String id) async {
     await FirebaseFirestore.instance.collection("contacts").doc(id).delete();
     if (mounted) {
-      showToast(message:"Contact deleted successfully");
+      showToast(message: "Contact deleted successfully");
     }
   }
 
@@ -52,7 +67,7 @@ class _HomeState extends State<Home> {
             onPressed: () async {
               await FirebaseAuth.instance.signOut();
               Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
-              showToast(message:"Successfully signed out");
+              showToast(message: "Successfully signed out");
             },
           ),
         ],
@@ -69,123 +84,129 @@ class _HomeState extends State<Home> {
         icon: const Icon(IconlyBroken.document),
         label: const Text("Add contact"),
       ),
-      body: StreamBuilder(
-        stream: contactCollection,
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            final List<QueryDocumentSnapshot> docs = snapshot.data!.docs;
-            if (docs.isEmpty) {
-              return const Center(child: Text("No Data"));
-            }
-            return ListView.builder(
-              itemCount: docs.length,
-              itemBuilder: (context, index) {
-                final contact = docs[index].data() as Map<String, dynamic>;
-                final contactID = docs[index].id;
-                final String contactName = contact["name"];
-                final String contactPhone = contact["phone"];
-                final String contactPhoto = contact["photo"];
-                final Color bgColor = _backgroundColors[index % _backgroundColors.length]; // Choose background color based on index
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              controller: _searchController,
+              onChanged: (value) {
+                setState(() {});
+              },
+              decoration: InputDecoration(
+                labelText: 'Search',
+                hintText: 'Search contacts...',
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            child: StreamBuilder(
+              stream: contactCollection,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  final List<QueryDocumentSnapshot> docs = snapshot.data!.docs;
+                  _contacts = docs;
 
-                return Container(
-                  margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                  decoration: BoxDecoration(
-                    color: bgColor,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: ListTile(
-                    title: Text(
-                      contactName,
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-                    ),
-                    subtitle: Text(contactPhone),
-                    leading: Hero(
-                      tag: contactID,
-                      child: CircleAvatar(
-                        backgroundImage: NetworkImage(contactPhoto),
-                      ),
-                    ),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          onPressed: () => callContact(contactPhone),
-                          icon: const Icon(
-                            IconlyBroken.call,
-                            color: Colors.lightGreen,
-                          ),
+                  if (docs.isEmpty) {
+                    return const Center(child: Text("No Data"));
+                  }
+
+                  List<QueryDocumentSnapshot> filteredContacts = _searchController.text.isEmpty
+                      ? docs
+                      : docs.where((contact) {
+                    final String name = contact["name"].toString().toLowerCase();
+                    final String phone = contact["phone"].toString().toLowerCase();
+                    final String query = _searchController.text.toLowerCase();
+                    return name.contains(query) || phone.contains(query);
+                  }).toList();
+
+                  return ListView.builder(
+                    itemCount: filteredContacts.length,
+                    itemBuilder: (context, index) {
+                      final contact = filteredContacts[index];
+                      final String contactName = contact["name"];
+                      final String contactPhone = contact["phone"];
+                      final String contactPhoto = contact["photo"];
+                      final String contactID = contact.id;
+                      final Color bgColor = _backgroundColors[index % _backgroundColors.length];
+
+                      return Container(
+                        margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                        decoration: BoxDecoration(
+                          color: bgColor,
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                        IconButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => EditContact(
-                                  name: contactName,
-                                  phone: contactPhone,
-                                  photo: contactPhoto,
-                                  id: contactID,
+                        child: ListTile(
+                          title: Text(
+                            contactName,
+                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                          ),
+                          subtitle: Text(contactPhone),
+                          leading: Hero(
+                            tag: contactID,
+                            child: CircleAvatar(
+                              backgroundImage: NetworkImage(contactPhoto),
+                            ),
+                          ),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                onPressed: () => callContact(contactPhone),
+                                icon: const Icon(
+                                  IconlyBroken.call,
+                                  color: Colors.lightGreen,
                                 ),
                               ),
-                            );
-                          },
-                          icon: const Icon(
-                            IconlyBroken.edit,
-                            color: Colors.orange,
+                              IconButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => EditContact(
+                                        name: contactName,
+                                        phone: contactPhone,
+                                        photo: contactPhoto,
+                                        id: contactID,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                icon: const Icon(
+                                  IconlyBroken.edit,
+                                  color: Colors.orange,
+                                ),
+                              ),
+                              IconButton(
+                                onPressed: () => deleteContact(contactID),
+                                icon: const Icon(
+                                  IconlyBroken.delete,
+                                  color: Colors.red,
+                                ),
+                              )
+                            ],
                           ),
                         ),
-                        IconButton(
-                          onPressed: () => deleteContact(contactID),
-                          icon: const Icon(
-                            IconlyBroken.delete,
-                            color: Colors.red,
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
+                      );
+                    },
+                  );
+                } else if (snapshot.hasError) {
+                  return const Center(
+                    child: Text("Error"),
+                  );
+                }
+                return const Center(
+                  child: CircularProgressIndicator(),
                 );
               },
-            );
-          } else if (snapshot.hasError) {
-            return const Center(
-              child: Text("Error"),
-            );
-          }
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        },
+            ),
+          ),
+        ],
       ),
     );
   }
-}
-
-showAlertDialog(BuildContext context, String message) {
-  Widget cancelButton = TextButton(
-    child: const Text("Cancel"),
-    onPressed: () {
-      Navigator.of(context).pop();
-    },
-  );
-
-  Widget continueButton = TextButton(
-    child: const Text("Continue"),
-    onPressed: () {
-      Navigator.of(context).pop();
-    },
-  );
-
-  AlertDialog alert = AlertDialog(
-    title: const Text("AlertDialog"),
-    content: Text(message),
-    actions: [cancelButton, continueButton],
-  );
-
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return alert;
-    },
-  );
 }
