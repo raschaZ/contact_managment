@@ -8,7 +8,6 @@ jobs:
 
     env:
       FLUTTER_HOME: /Users/runner/hostedtoolcache/flutter/1.17.5-stable/arm64
-      PATH: ${{ runner.tool_cache }}/flutter/1.17.5-stable/arm64/bin:$PATH
 
     steps:
       - uses: actions/checkout@v1
