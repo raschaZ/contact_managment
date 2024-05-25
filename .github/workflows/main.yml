@@ -1,4 +1,4 @@
-name: Build IPA
+name: Build and Upload IPA
 
 on:
   push:
@@ -28,5 +28,5 @@ jobs:
       - name: Collect IPA artifact
         uses: actions/upload-artifact@v2
         with:
-           name: adhoc-ipa
-           path: build/ios/ipa/*.ipa
+          name: adhoc-ipa
+          path: build/ios/iphoneos/*.ipa
