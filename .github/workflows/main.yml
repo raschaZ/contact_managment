@@ -1,24 +1,12 @@
-# Set the name of your workflow
 name: IOSBuilder
 
-# Controls when the action will run.
-# [workflow_dispatch] --> allows to run the workflow manually
-# you may use the following to build on each push
-# on:
-# push:
-# branches: [ master ]
 on: [workflow_dispatch]
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # In this workflow we use a single job called "build"
   build:
-    # The type of runner ie, the OS that the job will run on. apart from mac windows and ubuntu are also available
     runs-on: macos-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so our job can access it
       - uses: actions/checkout@v1
 
       - name: Create Folder for certificates and profiles
@@ -26,7 +14,6 @@ jobs:
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           mkdir -p ~/Library/MobileDevice/Certificates/
        
-      # Decode and save the p12 and provisioning files stored as secrets
       - name: Get Certificate
         run: |
           echo "${{ secrets.P12_BASE64 }}" | base64 --decode > ~/Library/MobileDevice/Certificates/certificate.p12
@@ -35,31 +22,40 @@ jobs:
         run: |
           echo "${{ secrets.MOBILEPROVISION_BASE64 }}" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/decoded.mobileprovision
 
-      # Install the necessary dependencies
       - name: Install python and codemagic tools
         uses: actions/setup-python@v2
         with:
           python-version: 3.8
+
       - name: Install python dependencies
         run: python -m pip install codemagic-cli-tools
       
-  # Install flutter
-      - name: Flutter get
+      - name: Initialize Keychain with certificate
+        run: |
+          keychain initialize
+          keychain add-certificates --certificate ~/Library/MobileDevice/Certificates/certificate.p12 --certificate-password "${{ secrets.cert_password }}"
+
+      - name: Install Flutter
         uses: subosito/flutter-action@v1.3.2
         with:
           flutter-version: '1.17.5'
+      
+      - name: Set up Flutter environment
+        run: |
+          echo "FLUTTER_HOME=/Users/runner/hostedtoolcache/flutter/1.17.5-stable/arm64" >> $GITHUB_ENV
+          echo "/Users/runner/hostedtoolcache/flutter/1.17.5-stable/arm64/bin" >> $GITHUB_PATH
+          echo "/Users/runner/hostedtoolcache/flutter/1.17.5-stable/arm64/bin/cache/dart-sdk/bin" >> $GITHUB_PATH
+      
       - run: flutter pub get
 
-      # Build and sign the ipa
       - name: Building IPA
         run: |
           xcode-project use-profiles
           flutter build ios --release --no-codesign
           xcode-project build-ipa --workspace ios/Runner.xcworkspace --scheme Runner --config Release
-      # Collect the files            
+
       - name: Collect ipa artifacts
         uses: actions/upload-artifact@v2
         with:
           name: adhoc-ipa
-          # Path to the release files
           path: build/ios/ipa/*.ipa
