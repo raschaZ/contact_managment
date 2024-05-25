@@ -6,6 +6,10 @@ jobs:
   build:
     runs-on: macos-latest
 
+    env:
+      FLUTTER_HOME: /Users/runner/hostedtoolcache/flutter/1.17.5-stable/arm64
+      PATH: ${{ runner.tool_cache }}/flutter/1.17.5-stable/arm64/bin:$PATH
+
     steps:
       - uses: actions/checkout@v1
 
@@ -44,11 +48,11 @@ jobs:
         with:
           flutter-version: '1.17.5'
       
-      - name: Set up Flutter environment
+      - name: Flutter Environment Setup
         run: |
-          echo "FLUTTER_HOME=/Users/runner/hostedtoolcache/flutter/1.17.5-stable/arm64" >> $GITHUB_ENV
-          echo "/Users/runner/hostedtoolcache/flutter/1.17.5-stable/arm64/bin" >> $GITHUB_PATH
-          echo "/Users/runner/hostedtoolcache/flutter/1.17.5-stable/arm64/bin/cache/dart-sdk/bin" >> $GITHUB_PATH
+          echo "FLUTTER_HOME=${FLUTTER_HOME}" >> $GITHUB_ENV
+          echo "${FLUTTER_HOME}/bin" >> $GITHUB_PATH
+          echo "${FLUTTER_HOME}/bin/cache/dart-sdk/bin" >> $GITHUB_PATH
       
       - run: flutter pub get
 
