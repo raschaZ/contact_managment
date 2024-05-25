@@ -33,7 +33,8 @@ jobs:
       - name: Initialize Keychain with certificate
         run: |
           keychain initialize
-          keychain add-certificates --certificate ~/Library/MobileDevice/Certificates/certificate.p12 --certificate-password "${{ secrets.cert_password }}"
+          ls -l ~/Library/MobileDevice/Certificates/
+          keychain add-certificates --certificate ~/Library/MobileDevice/Certificates/certificate.p12 --certificate-password "${{ secrets.cert_password }}" --log-stream stdout
 
       - name: Install Flutter
         uses: subosito/flutter-action@v1.3.2
