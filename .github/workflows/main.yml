@@ -78,4 +78,3 @@ jobs:
         name: adhoc-ipa
         # Path to the release files
         path: build/ios/ipa/*.ipa
-view rawiosBuilder.yml hosted with ❤ by GitHub
