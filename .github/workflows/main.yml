@@ -43,4 +43,23 @@ jobs:
       - name: Install python dependencies
         run: python -m pip install codemagic-cli-tools
       
-      # Debugging: Print certificate password (
+  # Install flutter
+      - name: Flutter get
+        uses: subosito/flutter-action@v1.3.2
+        with:
+          flutter-version: '1.17.5'
+      - run: flutter pub get
+
+      # Build and sign the ipa
+      - name: Building IPA
+        run: |
+          xcode-project use-profiles
+          flutter build ios --release --no-codesign
+          xcode-project build-ipa --workspace ios/Runner.xcworkspace --scheme Runner --config Release
+      # Collect the files            
+      - name: Collect ipa artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: adhoc-ipa
+          # Path to the release files
+          path: build/ios/ipa/*.ipa
