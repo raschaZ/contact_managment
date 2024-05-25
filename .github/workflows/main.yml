@@ -32,12 +32,12 @@ jobs:
       - name: Install python dependencies
         run: python -m pip install codemagic-cli-tools
 
-      - name: Debug Environment Variables
+      - name: Debug Secrets (Do not output sensitive information)
         run: |
-          echo "P12_BASE64=${{ secrets.P12_BASE64 }}"
-          echo "cert_password=${{ secrets.cert_password }}"
-          echo "MOBILEPROVISION_BASE64=${{ secrets.MOBILEPROVISION_BASE64 }}"
-          # Make sure not to output actual secret values in a public log
+          echo "Debugging Secrets"
+          echo "P12_BASE64 length: ${#P12_BASE64}"
+          echo "MOBILEPROVISION_BASE64 length: ${#MOBILEPROVISION_BASE64}"
+          echo "cert_password length: ${#cert_password}"
 
       - name: Initialize Keychain with certificate
         run: |
