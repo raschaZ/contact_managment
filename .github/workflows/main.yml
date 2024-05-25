@@ -28,22 +28,12 @@ jobs:
        
       # Decode and save the p12 and provisioning files stored as secrets
       - name: Get Certificate
-        id: certFileDecode
-        uses: timheuer/base64-to-file@v1.0.3
-        with:
-          fileName: 'certificate.p12'
-          encodedString: ${{ secrets.P12_BASE64 }}
-      - name: Copy Certificate
-        run: mv ${{ steps.certFileDecode.outputs.filePath }} ~/Library/MobileDevice/Certificates/certificate.p12
+        run: |
+          echo "${{ secrets.P12_BASE64 }}" | base64 --decode > ~/Library/MobileDevice/Certificates/certificate.p12
        
       - name: Get Profile
-        id: profFileDecode
-        uses: timheuer/base64-to-file@v1.0.3
-        with:
-          fileName: 'decoded.mobileprovision'
-          encodedString: ${{ secrets.MOBILEPROVISION_BASE64 }}
-      - name: Copy Profiles
-        run: mv ${{ steps.profFileDecode.outputs.filePath }} ~/Library/MobileDevice/Provisioning\ Profiles/decoded.mobileprovision
+        run: |
+          echo "${{ secrets.MOBILEPROVISION_BASE64 }}" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/decoded.mobileprovision
 
       # Install the necessary dependencies
       - name: Install python and codemagic tools
