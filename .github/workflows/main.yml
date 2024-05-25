@@ -19,6 +19,10 @@ jobs:
         with:
           flutter-version: '3.19.3'
 
+      - name: Install xcoder
+        run: |
+          gem install xcoder
+
       - name: Install dependencies
         run: flutter pub get
 
