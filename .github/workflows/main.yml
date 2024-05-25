@@ -17,6 +17,8 @@ jobs:
       - name: Get Certificate
         run: |
           echo "${{ secrets.P12_BASE64 }}" | base64 --decode > ~/Library/MobileDevice/Certificates/certificate.p12
+          ls -l ~/Library/MobileDevice/Certificates/
+          file ~/Library/MobileDevice/Certificates/certificate.p12
        
       - name: Get Profile
         run: |
