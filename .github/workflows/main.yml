@@ -25,9 +25,10 @@ jobs:
       - name: Build iOS
         run: flutter build ios --no-codesign
 
-      - name: Upload build artifacts
+      - name: collect ipa artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: ios-build
-          path: build/ios/iphoneos
+         name: adhoc-ipa
+         # Path to the release files
+         path: build/ios/ipa/*.ipa
 
