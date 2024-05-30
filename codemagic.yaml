@@ -21,7 +21,7 @@ workflows:
           flutter build ipa --release \
             --build-name=1.0.0 \
             --build-number=1 \
-            --export-options-plist=path/to/ExportOptions.plist
+            --export-options-plist=ios/runner/ExportOptions.plist
     artifacts:
       - build/ios/iphoneos/*.ipa
     publishing:
