@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="gcm_defaultSenderId" translatable="false">270164985236</string>
+    <string name="google_api_key" translatable="false">AIzaSyDJ50dBbGXasRAFgjC3j285xwaWK7Ctq_o</string>
+    <string name="google_app_id" translatable="false">1:270164985236:android:fd84a488ffa46db256fb81</string>
+    <string name="google_crash_reporting_api_key" translatable="false">AIzaSyDJ50dBbGXasRAFgjC3j285xwaWK7Ctq_o</string>
+    <string name="google_storage_bucket" translatable="false">contact-management-5d438.appspot.com</string>
+    <string name="project_id" translatable="false">contact-management-5d438</string>
+</resources>

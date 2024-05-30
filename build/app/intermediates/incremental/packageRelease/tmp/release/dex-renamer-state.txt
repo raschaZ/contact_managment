@@ -1,0 +1,4 @@
+#Tue May 21 13:20:49 CET 2024
+base.0=C\:\\Users\\Racha\\AndroidStudioProjects\\contact_managment\\build\\app\\intermediates\\dex\\release\\minifyReleaseWithR8\\classes.dex
+path.0=classes.dex
+renamed.0=classes.dex

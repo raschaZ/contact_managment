@@ -1,0 +1,12 @@
+io.flutter.plugins.pathprovider.path_provider_android-jetified-annotation-experimental-1.1.0-0 C:\Users\Racha\.gradle\caches\transforms-3\257e0bb88528f5fc66bfd853728809aa\transformed\jetified-annotation-experimental-1.1.0\res
+io.flutter.plugins.pathprovider.path_provider_android-jetified-window-1.0.0-beta04-1 C:\Users\Racha\.gradle\caches\transforms-3\6582e67aea0be70979c64a0bfb01e347\transformed\jetified-window-1.0.0-beta04\res
+io.flutter.plugins.pathprovider.path_provider_android-core-1.6.0-2 C:\Users\Racha\.gradle\caches\transforms-3\974b4f2252348b5ef43741b27d416a49\transformed\core-1.6.0\res
+io.flutter.plugins.pathprovider.path_provider_android-jetified-window-java-1.0.0-beta04-3 C:\Users\Racha\.gradle\caches\transforms-3\9b0dd0bee9a81680af20f56797c52ab1\transformed\jetified-window-java-1.0.0-beta04\res
+io.flutter.plugins.pathprovider.path_provider_android-pngs-4 C:\Users\Racha\AndroidStudioProjects\contact_managment\build\path_provider_android\generated\res\pngs\release
+io.flutter.plugins.pathprovider.path_provider_android-resValues-5 C:\Users\Racha\AndroidStudioProjects\contact_managment\build\path_provider_android\generated\res\resValues\release
+io.flutter.plugins.pathprovider.path_provider_android-rs-6 C:\Users\Racha\AndroidStudioProjects\contact_managment\build\path_provider_android\generated\res\rs\release
+io.flutter.plugins.pathprovider.path_provider_android-mergeReleaseResources-7 C:\Users\Racha\AndroidStudioProjects\contact_managment\build\path_provider_android\intermediates\incremental\release\mergeReleaseResources\merged.dir
+io.flutter.plugins.pathprovider.path_provider_android-mergeReleaseResources-8 C:\Users\Racha\AndroidStudioProjects\contact_managment\build\path_provider_android\intermediates\incremental\release\mergeReleaseResources\stripped.dir
+io.flutter.plugins.pathprovider.path_provider_android-merged_res-9 C:\Users\Racha\AndroidStudioProjects\contact_managment\build\path_provider_android\intermediates\merged_res\release
+io.flutter.plugins.pathprovider.path_provider_android-main-10 C:\Users\Racha\AppData\Local\Pub\Cache\hosted\pub.dev\path_provider_android-2.2.4\android\src\main\res
+io.flutter.plugins.pathprovider.path_provider_android-release-11 C:\Users\Racha\AppData\Local\Pub\Cache\hosted\pub.dev\path_provider_android-2.2.4\android\src\release\res
