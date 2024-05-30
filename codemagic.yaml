@@ -1,35 +1,28 @@
 workflows:
-  build_and_publish:
-    name: Build and Publish Workflow
+  simulator-native-ios:
+    name: iOS simulator build
     max_build_duration: 120
+    instance_type: mac_mini_m1
     environment:
-      flutter: stable
-      xcode: latest
-      cocoapods: default
+      vars:
+        XCODE_WORKSPACE: "your_workspace_name.xcworkspace"
+        XCODE_SCHEME: "your_workspace_name"
     scripts:
-      - name: Set up code signing settings on Xcode project
+      - name: Install CocoaPods dependencies
         script: | 
-          xcode-project use-profiles
-      - name: Get Flutter packages
+          pod install
+      - name: Build the .app
         script: | 
-          flutter packages pub get
-      - name: Install pods
-        script: | 
-          find . -name "Podfile" -execdir pod install \;
-      - name: Flutter build ipa
-        script: | 
-          flutter build ipa --release \
-            --build-name=1.0.0 \
-            --export-options-plist=/Users/builder/export_options.plist
+          xcodebuild build \
+            -workspace "$XCODE_WORKSPACE" \
+            -scheme "$XCODE_SCHEME" \
+            -sdk iphonesimulator \
+            -destination 'platform=iOS Simulator,name=iPhone 14 Pro,OS=16.2' \
+            -configuration Debug \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO 
     artifacts:
-      - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
-      - flutter_drive.log
-      
-    publishing:
-      email:
-        recipients:
-          - rasha.zaibi@gmail.com
-        notify:
-          success: true
-          failure: true
+      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.app
+      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM
